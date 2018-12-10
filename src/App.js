@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 import './App.css';
 import Nginep from './component/nginep';
-
+import Marker from './component/marker';
 
 class App extends Component {
   constructor(props) {
@@ -17,6 +17,7 @@ class App extends Component {
 
   componentDidMount () {
     fetch('https://raw.githubusercontent.com/algosigma/js-reactjs/master/homestays.json')
+    // fetch('http://localhost/react-js/nginep/src/data.json')
       .then (response => response.json())
       .then ((data) => {
         this.setState ({
@@ -30,6 +31,12 @@ class App extends Component {
     this.setState ({
       search: event.target.value,
       datanginep: this.state.semuadatanginep.filter((datanginep) => new RegExp(event.target.value, 'i').exec(datanginep.nama))
+    })
+  }
+
+  selectedHomestay = (datanginep) => {
+    this.setState ({
+      pilihdatanginep: datanginep
     })
   }
 
@@ -59,15 +66,29 @@ class App extends Component {
 
           <div className="homestay">
             {this.state.datanginep.map((datanginep)=> {
-              return <Nginep key={datanginep.id} datanginep={datanginep} />
+              return <Nginep 
+              key={datanginep.id} 
+              datanginep={datanginep} 
+              selectedHomestay={this.selectedHomestay}/>
             })}
           </div>
 
         </div>
         
         <div className="peta">
-          <GoogleMapReact center={center} zoom={15} >
+          <GoogleMapReact
+          bootstrapURLKeys={{ key: 'AIzaSyB8bw82gKhFMRPLAFidlLTCWd6gCVedhR4' }}
+          defaultCenter={center} 
+          defaultZoom={15} >
           
+          {this.state.datanginep.map((datanginep)=> {
+            return <Marker
+            key={datanginep.id}
+            lat={datanginep.lat}
+            lng={datanginep.lng}
+            text={datanginep.harga}
+            selected={datanginep === this.state.selectedHomestay} />
+          })}
           </GoogleMapReact>
         </div>
 
